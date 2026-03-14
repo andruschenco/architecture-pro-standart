@@ -9,13 +9,15 @@
 ### Пункт 1. Карта текущего IT-ландшафта. 
 ##### В строках она должна содержать элементы организационной структуры, а в колонках — бизнес-возможности второго уровня. Например, в строке стоит кол-центр, а в колонке — продажи через кол-центр.
   - [Ссылка на drawio файл](integration-scheme.drawio)
-  
-![integration-scheme.drawio.png](integration-scheme.drawio.png)
+
+![integration-scheme.png](integration-scheme.png)
+
 
 ### Пункт 2. Схема интеграции приложений с указанием участников процессов.
   - [Ссылка на drawio файл](IT-landscape.drawio)
 
 ![IT-landscape.png](IT-landscape.png)
+
 
 
 

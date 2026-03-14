@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+
+title Диаграмма контекста - Передача ставок в кол-центр
+
+Person(back_office_manager, "Менеджер бэк-офиса", "Управляет ставками по депозитам в АБС")
+Person(call_center_operator, "Менеджер внутреннего кол-центра", "Консультирует клиентов по ставкам")
+Person(partner_operator, "Менеджер партнёрского кол-центра", "Консультирует клиентов по ставкам")
+
+System_Boundary(rates_distribution, "Система распространения ставок") {
+    System(abs, "АБС", "Delphi / Oracle", "Хранение и управление ставками по депозитам")
+    System(call_center_system, "Система кол-центра", "React / Java / PostgreSQL", "CRM для операторов")
+}
+
+System_Ext(partner_system, "Система партнёрского кол-центра", "Внешняя система", "Работает по файлам через SFTP")
+
+Rel(back_office_manager, abs, "Обновляет ставки")
+
+Rel(abs, call_center_system, "Передаёт актуальные ставки", "REST API / Kafka")
+Rel(abs, partner_system, "Передаёт файл со ставками", "SFTP")
+
+Rel(call_center_operator, call_center_system, "Видит актуальные ставки при консультации")
+Rel(partner_operator, partner_system, "Видит ставки из загруженного файла")
+
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+!include <C4/C4_Container>
+!include <C4/C4_Context>
+
+title Диаграмма контейнеров - Передача ставок в кол-центр
+Boundary(abs_system_, "") {
+    Person(back_office_manager, "Менеджер бэк-офиса")
+    Person(call_center_operator, "Менеджер кол-центра")
+}
+
+System_Ext(partner_system, "Система партнёрского кол-центра", "SFTP-сервер")
+
+Container_Boundary(call_center123, "Система кол-центра") {
+
+Container_Boundary(abs_system, "Автоматизированная банковская система (АБС)") {
+    Container(abs_db, "База данных АБС", "Oracle", "Хранение ставок, клиентов, депозитов")
+    Container(abs_core, "Ядро АБС", "Delphi / PL-SQL", "Бизнес-логика, расчёт ставок")
+    Container(rates_api, "REST API ставок", "Java / Spring Boot", "Новый компонент для доступа к ставкам")
+    Container(sftp_exporter, "SFTP-экспортёр", "Java", "Формирует и выгружает файлы со ставками")
+    ContainerDb(rates_history, "История ставок", "PostgreSQL", "Хранение изменений ставок для аудита")
+}
+
+Container_Boundary(call_center, "Система кол-центра") {
+    Container(cc_ui, "Веб-интерфейс", "React.js", "Интерфейс оператора")
+    Container(cc_backend, "Бэкенд кол-центра", "Java Spring Boot", "Бизнес-логика, API")
+    Container(cc_db, "БД кол-центра", "PostgreSQL", "Хранение обращений и клиентов")
+    Container(rates_cache, "Кэш ставок", "Redis", "Кэширование актуальных ставок для быстрого доступа")
+}
+}
+
+Rel(back_office_manager, abs_core, "Вводит/изменяет ставки")
+Rel(abs_core, abs_db, "Читает/пишет")
+
+Rel(abs_core, rates_api, "Передаёт изменения ставок", "событие")
+Rel(abs_core, sftp_exporter, "Сигнализирует об изменениях")
+
+Rel(rates_api, rates_history, "Сохраняет историю")
+Rel(sftp_exporter, rates_history, "Сохраняет историю экспорта")
+
+Rel(rates_api, cc_backend, "GET /api/rates", "REST/HTTPS")
+Rel(cc_backend, rates_cache, "Кэширует ставки")
+Rel(cc_backend, cc_db, "Читает/пишет")
+Rel(cc_ui, cc_backend, "Запрашивает ставки", "HTTPS")
+Rel(call_center_operator, cc_ui, "Консультирует клиента")
+
+Rel(sftp_exporter, partner_system, "PUT rates.csv", "SFTP")
+
+@enduml

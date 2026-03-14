@@ -53,13 +53,13 @@
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="KTnxqnypoAEXlHY1B6JH-14" parent="1" style="whiteSpace=wrap;strokeWidth=2;" value="Вспомогательные" vertex="1">
+        <mxCell id="KTnxqnypoAEXlHY1B6JH-14" parent="1" style="whiteSpace=wrap;strokeWidth=2;" value="Вспомогательные средства" vertex="1">
           <mxGeometry height="128" width="527" x="654" y="1288" as="geometry" />
         </mxCell>
         <mxCell id="KTnxqnypoAEXlHY1B6JH-15" parent="1" style="whiteSpace=wrap;strokeWidth=2;" value="Внешние системы" vertex="1">
           <mxGeometry height="128" width="604" x="1178" y="2044" as="geometry" />
         </mxCell>
-        <mxCell id="KTnxqnypoAEXlHY1B6JH-16" parent="1" style="whiteSpace=wrap;strokeWidth=2;" value="Core банковские системы" vertex="1">
+        <mxCell id="KTnxqnypoAEXlHY1B6JH-16" parent="1" style="whiteSpace=wrap;strokeWidth=2;" value="Ядро, банковские системы" vertex="1">
           <mxGeometry height="480" width="803" x="1013" y="1490" as="geometry" />
         </mxCell>
         <mxCell id="KTnxqnypoAEXlHY1B6JH-17" parent="1" style="whiteSpace=wrap;strokeWidth=2;verticalAlign=top;" value="Frontend системы" vertex="1">

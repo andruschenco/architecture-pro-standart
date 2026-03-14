@@ -1,0 +1,41 @@
+@startuml
+
+!include ../resources/lib/C4_Component.puml
+!include ../resources/lib/C4_Container.puml
+
+title Диаграмма контекста - Открытие депозитов онлайн (MVP)
+
+Boundary(deposits_clients, "Клиенты открывающие депозиты онлайн") {
+    Person(client_new, "Новый клиент", "Потенциальный клиент банка, посещающий сайт")
+    Person(client_existing, "Существующий клиент", "Клиент с доступом в интернет-банк")
+}
+
+Boundary(deposits_managers, "Сотрудники участники процесса на стороне банка") {
+    Person(call_center_operator, "Менеджер кол-центра", "Обрабатывает заявки с сайта")
+    Person(back_office_manager, "Менеджер бэк-офиса", "Подтверждает депозиты и управляет ставками")
+    Person(front_office_manager, "Менеджер фронт-офиса", "Работает с клиентами в отделении")
+}
+System_Boundary(online_deposits, "Открытие депозитов онлайн") {
+    Container(website, "Сайт банка", "PHP / React.js", "Маркетинговая информация и сбор заявок")
+    Container(internet_bank, "Интернет-банк", "ASP.NET MVC / MS SQL", "Обслуживание существующих клиентов")
+    System(abs, "АБС Автоматизированная банковская система \n (учёт депозитов, ставки)", "Delphi / Oracle")
+}
+
+System_Boundary(externalSystem, "Вешние системы") {
+System_Ext(call_center_system, "Система кол-центра \n (Управление обращениями)", "React / Java / PostgreSQL")
+System_Ext(sms_gateway, "СМС-шлюз \n (Отправка СМС-уведомлений)", "Телеком-оператор")
+}
+Rel(client_new, website, "Посещает сайт, подаёт заявку")
+Rel(client_existing, internet_bank, "Входит в интернет-банк, подаёт заявку")
+
+website --> call_center_system :"Передаёт заявки новых клиентов"
+internet_bank <--> abs :"Отправка заявки (асинхронно) / ход рассмотрения"
+Rel(call_center_system, abs, "Запрашивает/обновляет информацию по заявкам")
+
+Rel(call_center_operator, call_center_system, "Работает с заявками")
+Rel(back_office_manager, abs, "Подтверждает депозиты, управляет ставками")
+Rel(front_office_manager, abs, "Создаёт депозиты для клиентов в отделении")
+
+Rel(abs, sms_gateway, "Отправляет СМС-уведомления")
+
+@enduml
