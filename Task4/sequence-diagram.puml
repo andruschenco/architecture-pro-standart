@@ -1,0 +1,29 @@
+@startuml
+title Обновление ставок и доставка в кол-центры
+
+actor "Менеджер бэк-офиса" as BO
+participant "АБС" as ABS
+participant "REST API ставок" as API
+participant "SFTP-экспортёр" as SFTP
+participant "Система кол-центра" as CC
+participant "Система партнёра" as Partner
+actor "Менеджер кол-центра" as CO
+actor "Менеджер партнёра" as PO
+
+BO -> ABS: Обновляет ставки
+ABS -> API: Оповещение об изменении
+ABS -> SFTP: Запуск экспорта
+
+API -> CC: Отправка обновлений (REST)
+CC -> CC: Обновление кэша ставок
+
+SFTP -> SFTP: Формирование CSV-файла
+SFTP -> Partner: Загрузка файла (SFTP)
+
+CO -> CC: Запрос ставок
+CC --> CO: Отображение актуальных ставок
+
+Partner -> Partner: Загрузка файла
+PO -> Partner: Просмотр ставок
+
+@enduml

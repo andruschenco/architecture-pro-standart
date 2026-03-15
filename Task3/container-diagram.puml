@@ -1,0 +1,64 @@
+@startuml
+!include ../resources/lib/C4_Component.puml
+!include ../resources/lib/C4_Container.puml
+
+title Диаграмма контейнеров - Открытие депозитов онлайн (MVP)
+
+Person(client_new, "Новый клиент")
+Person(client_existing, "Существующий клиент")
+Person(call_center_operator, "Менеджер кол-центра")
+Person(back_office_manager, "Менеджер бэк-офиса")
+
+System_Ext(sms_gateway, "СМС-шлюз", "Телеком-оператор")
+
+Container_Boundary(online_deposits, "Система открытия депозитов") {
+    Container(website, "Сайт банка", "PHP, React.js", "Маркетинговый сайт, сбор заявок от новых клиентов")
+    Container(internet_bank, "Интернет-банк (монолит)", "ASP.NET MVC, MS SQL", "Обслуживание существующих клиентов")
+    Container(gateway, "API Gateway", ".NET Core / Java", "Единая точка входа, маршрутизация, rate limiting, TLS")
+    Container(deposit_service, "Сервис депозитов", "Java, Spring Boot, PostgreSQL", "Бизнес-логика управления заявками")
+    Container(kafka, "Message Broker", "Apache Kafka", "Асинхронная доставка сообщений")
+    Container(sms_service, "Сервис СМС", "Java, Spring Boot", "Отправка СМС-уведомлений")
+    ContainerDb(deposit_db, "БД сервиса депозитов", "PostgreSQL", "Хранение заявок, временных данных")
+}
+
+System(abs, "АБС Автоматизированная банковская система \n -Учёт депозитов\n -Управление ставками \n-Kafka-клиент", "Delphi, Oracle")
+
+System_Ext(call_center_system, "Система кол-центра \n (Управление обращениями и заявками)", "React, Java, PostgreSQL")
+
+' Связи клиентов
+Rel(client_new, website, "Просматривает ставки, подаёт заявку", "HTTPS")
+Rel(client_existing, internet_bank, "Входит в ЛК, видит ставки, подаёт заявку", "HTTPS")
+
+' Связи сайта
+Rel(website, gateway, "Отправляет заявки", "HTTPS")
+
+' Связи интернет-банка
+Rel(internet_bank, gateway, "Отправляет заявки", "HTTPS")
+Rel(internet_bank, sms_service, "Запрашивает отправку СМС", "REST/HTTPS")
+
+' Связи API Gateway
+Rel(gateway, deposit_service, "Перенаправляет запросы", "REST/HTTPS")
+
+' Связи сервиса депозитов
+Rel(deposit_service, deposit_db, "Читает/записывает", "SQL")
+Rel(deposit_service, kafka, "Публикует события/заявки", "Kafka API")
+
+' Связи брокера сообщений
+Rel(kafka, abs, "Доставляет заявки", "Kafka API")
+Rel(kafka, call_center_system, "Доставляет заявки с сайта", "Kafka API")
+
+' Связи АБС
+Rel(abs, sms_service, "Отправляет команды на СМС", "REST/HTTPS")
+Rel(abs, sms_gateway, "Отправляет СМС", "API оператора")
+
+' Связи системы кол-центра
+Rel(call_center_system, abs, "Запрашивает/обновляет статус", "REST/HTTPS")
+Rel(call_center_operator, call_center_system, "Работает с заявками с сайта", "HTTPS")
+
+' Связи бэк-офиса
+Rel(back_office_manager, abs, "Подтверждает депозиты, управляет ставками", "Десктоп-клиент")
+
+' Связи сервиса СМС
+Rel(sms_service, sms_gateway, "Отправляет СМС", "API оператора")
+
+@enduml

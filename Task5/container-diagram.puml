@@ -1,0 +1,48 @@
+@startuml
+!include ../resources/lib/C4_Component.puml
+!include ../resources/lib/C4_Container.puml
+
+
+title Диаграмма контейнеров - Заявка на кредит онлайн
+
+Person(client, "Клиент")
+
+Container(site, "Сайт банка", "PHP / React.js")
+Container(internet_bank, "Интернет-банк", "ASP.NET MVC / MS SQL")
+
+Container_Boundary(credit_api_system, "Обработка кредитных заявок") {
+    Container(gateway, "API Gateway", "Spring Boot", "Точка входа, маршрутизация, аутентификация")
+    Container(validation, "Validation Service", "Spring Boot", "Валидация входных данных")
+    Container(orchestrator, "Orchestrator", "Spring Boot + Kafka", "Управление Saga-транзакцией")
+    Container(cache, "Redis", "Redis", "Кэш предодобренных предложений, временные данные")
+    ContainerDb(database, "PostgreSQL", "PostgreSQL", "Хранение заявок, аудит")
+    Container(kafka_producer, "Kafka Producer", "Spring Kafka", "Отправка сообщений")
+}
+    System(scoring, "Система скоринга", "Python/Flask")
+    System(conveyor, "Кредитный конвейер", "Camunda/Oracle")
+System_Ext(sms, "SMS-шлюз")
+System_Ext(bki, "БКИ")
+
+Rel(client, site, "HTTPS")
+Rel(client, internet_bank, "HTTPS")
+
+Rel(site, gateway, "POST /applications", "REST/JSON")
+Rel(internet_bank, gateway, "POST /applications", "REST/JSON")
+
+Rel(gateway, validation, "Внутренний вызов")
+Rel(validation, orchestrator, "Внутренний вызов")
+
+Rel(orchestrator, cache, "Читает предодобренные")
+Rel(orchestrator, database, "Сохраняет заявку")
+
+Rel(orchestrator, scoring, "Запрос скоринга", "REST")
+Rel(orchestrator, kafka_producer, "Отправить заявку")
+Rel(kafka_producer, conveyor, "Kafka topic: credit-applications")
+
+Rel(orchestrator, sms, "Отправить СМС", "REST")
+
+Rel(scoring, bki, "Запрос данных", "REST")
+
+Rel(conveyor, gateway, "PATCH /applications/{id}/status", "Webhook")
+
+@enduml
