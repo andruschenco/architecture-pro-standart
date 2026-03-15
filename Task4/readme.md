@@ -7,8 +7,7 @@
 
 ---
 ### 4.1. ADR Обеспечение доступа кол-центра и партнёрского кол-центра к актуальным ставкам по депозитам
-
-[ADR_deposit_rates.md](ADR_deposit_rates.md)
+- [ADR_deposit_rates.md](ADR_deposit_rates.md)
 
 ### 4.2. Список крупных задач (Список крупных задач для каждой системы)
 
@@ -43,5 +42,4 @@
 
 
 ### 4.3 Подготовьте RoadMap в draw.io.
-
-[RoadMap в draw.io](RoadMap.drawio)
+- [RoadMap в draw.io](RoadMap.drawio)

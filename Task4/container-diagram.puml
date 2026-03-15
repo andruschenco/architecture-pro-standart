@@ -1,6 +1,6 @@
 @startuml
-!include <C4/C4_Container>
-!include <C4/C4_Context>
+!include ../resources/lib/C4_Component.puml
+!include ../resources/lib/C4_Container.puml
 
 title Диаграмма контейнеров - Передача ставок в кол-центр
 Boundary(abs_system_, "") {

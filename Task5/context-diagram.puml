@@ -1,0 +1,43 @@
+@startuml
+!include ../resources/lib/C4_Component.puml
+!include ../resources/lib/C4_Container.puml
+
+
+title Диаграмма контекста - Заявка на кредит онлайн
+
+Person(client, "Клиент", "Пользователь банка, подающий заявку на кредит")
+Person(manager, "Менеджер отделения", "Сотрудник, обрабатывающий заявки")
+
+System_Ext(bki, "Бюро кредитных историй", "Внешняя система, предоставляет данные по клиентам")
+System_Ext(sms, "SMS-шлюз", "Внешний сервис для отправки уведомлений")
+
+System_Boundary(bank, "Банк «Стандарт»") {
+    Container(site, "Сайт банка", "PHP / React.js", "Маркетинговая информация, подача заявок")
+    Container(internet_bank, "Интернет-банк", "ASP.NET MVC / MS SQL", "Обслуживание существующих клиентов")
+
+    Container(credit_api, "Credit Application API", "Spring Boot", "Центральный микросервис для приёма заявок")
+    ContainerDb(credit_db, "Credit API DB", "PostgreSQL", "Хранение заявок и статусов")
+
+    Container(conveyor, "Кредитный конвейер", "Camunda / Oracle", "Обработка заявок сотрудниками")
+    Container(scoring, "Система скоринга", "Python / Flask / PostgreSQL", "Расчёт кредитного рейтинга")
+    Container(abs, "АБС", "Delphi / Oracle", "Учёт операций, открытие счетов")
+}
+
+Rel(client, site, "Подаёт заявку", "HTTPS")
+Rel(client, internet_bank, "Подаёт заявку", "HTTPS")
+Rel(site, credit_api, "Создаёт заявку", "REST/JSON")
+Rel(internet_bank, credit_api, "Создаёт заявку", "REST/JSON")
+
+Rel(credit_api, credit_db, "Читает/пишет", "SQL")
+Rel(credit_api, scoring, "Запрашивает скоринг", "REST")
+Rel(credit_api, sms, "Отправляет уведомление", "REST")
+
+Rel(scoring, bki, "Получает данные", "REST")
+
+Rel(credit_api, conveyor, "Отправляет заявку", "Kafka")
+Rel(conveyor, abs, "Зачисляет средства", "Oracle SQL")
+Rel(manager, abs, "Обрабатывает заявку", "Десктоп клиент")
+
+Rel(conveyor, credit_api, "Обновляет статус", "REST")
+
+@enduml
